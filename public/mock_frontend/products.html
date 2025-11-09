@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Demo</title>
+</head>
+<body>
+  <div>
+    <span>Navigation: </span>
+    <span><a href="./index.html">Back to index</a></span>
+  </div>
+  <h1>Product CRUD Demo</h1>
+  <div>
+    <form action="/api/products" method="POST" id="productForm">
+      <h2>Create</h2>
+      <div>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required/>
+      </div>
+      <div>
+        <label for="price">Price</label>
+        <input id="price" name="price" type="number" required/>
+      </div>
+      <div>
+        <label for="desc">Description</label>
+        <input id="desc" name="description" type="text"/>
+      </div>
+      <div>
+        <label for="img_url">image url</label>
+        <input id="img_url" name="image" type="text" />
+      </div>
+      <input type="submit" id="submitForm" value="Submit">
+      </form>
+      <form action="/api/products:id" method="POST" id="editForm">
+      <h2>Update</h2>
+      <i>Select for update first to enable fields</i>
+      <div>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required disabled/>
+      </div>
+      <div>
+        <label for="price">Price</label>
+        <input id="price" name="price" type="number" required disabled/>
+      </div>
+      <div>
+        <label for="desc">Description</label>
+        <input id="desc" name="description" type="text" disabled/>
+      </div>
+      <div>
+        <label for="img_url">image url</label>
+        <input id="img_url" name="image" type="text"  disabled/>
+      </div>
+      <input type="submit" id="submitForm" value="Push update" disabled>
+    </form>
+  </div>
+  <button id="getProduct">Get Products</button>
+  <table id="productList"></table>
+
+  <script>
+    const form = document.getElementById('productForm');
+    const API_BASE = 'http://localhost:5000/api';
+
+    const productsTable = document.getElementById('productList');
+    setRow(['Name', 'Price', 'Created', 'Modified', 'img', 'Actions'], productsTable, true);
+
+    function setRow(headers, _table){
+      setRow(headers, _table, false);
+    }
+
+    function setRow(headers, _table, isHeader){
+      const _header = document.createElement('tr') ;
+      for(_data of headers){
+        const td = document.createElement(isHeader === true ? 'th' :'td');
+        if(_data instanceof HTMLElement){
+          td.appendChild(_data);
+        }else{
+          td.textContent = _data
+        }
+        _header.appendChild(td);
+      }
+      _table.appendChild(_header);
+    }
+    function deleteCreatorHelper(bId){
+      const _button = document.createElement('INPUT');
+      _button.setAttribute("type", "button"); 
+      _button.style.backgroundColor = "red"; 
+      _button.value = "Delete";
+      _button.addEventListener("click", async() => {
+        try {
+          const res = await fetch(`${API_BASE}/products/${bId}`, { method: "DELETE"});
+          if (!res.ok) throw new Error(`Failed to ${bId}: ${res.statusText}`);
+          console.log(`$Deleted product ${bId}`);
+          getAll(); // refresh the list
+        } catch (err) {
+          console.error(err);
+        }
+      });
+      return _button;
+    }
+
+    window.onload = () => getAll();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        name: form.name.value,
+        price: form.price.value,
+        description: form.description.value,
+        img_url: form.img_url.value,
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        console.log('Success:', result);
+        form.reset();
+        getAll();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+    
+    document.getElementById('getProducts').addEventListener('click', ()=> getAll());
+    
+    async function getAll(){
+      try {
+        const res = await fetch(`${API_BASE}/products`);
+        const data = await res.json();
+        
+        data.forEach(p => {
+          const img = document.createElement('img'); img.src = p.image; img.alt = p.image;
+          const delButton = deleteCreatorHelper(p.id);
+          const editButton = editCreatorHelper(p.id, );
+          setRow([p.name, p.price, p.create_at, p.modified_at, img, delButton, editButton], productsTable);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  </script>
+</body>
+</html>
