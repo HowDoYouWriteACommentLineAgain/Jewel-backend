@@ -1,73 +1,63 @@
-import Product from "../models/Product.js";
-import db from "../firebase.js";
-import {collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { fetchAllProducts, createProduct, putProduct, fetchByIdProduct, deleteProduct, getAndVerifyDocSnap } from "../Repositories/ProductsRepository.js";
 
-const now = () => new Date().toISOString();
-
-export const createProduct = async (req, res) => {
-    try {
-      const data = req.body;
-      console.log('product contoller @ data:',data);
-      const product = new Product({...data, created_at: now(), modified_at: now()}); // Also tests that data is valid acc to model
-      const docRef = await addDoc(collection(db, 'products'), product.toFirstore());
-      res.status(201).json({message: 'Product created successfully', id: docRef.id});
-    }catch (error){
-        res.status(400).send(error.message);
-    }
+export const createProductController = async (req, res) => {
+  try {
+    console.log(` @createProduct Controller => req.body : ${JSON.stringify(req.body)}`);
+    const id = await createProduct(req.body);
+    res.status(201).json({message: 'Product created successfully', id: id});
+  }catch (error){
+    res.status(400).send(error.message);
+  }
 };
 
-export const getProducts = async (_req, res) => {
+export const getProductsController = async (_, res) => {
   try {
-    const products = await getDocs(collection(db, 'products'));
-    const productArray = [];
-
-    if (products.empty) {
-      res.status(400).send('No Products found');
-    } else {
-      products.forEach(doc => {
-        try{      productArray.push(new Product({id: doc.id,...doc.data()}));}
-        catch(e){ console.warn(`Skipped invalid doc ${doc.id} ${e.message}`);}
-      });
-      res.status(200).send(productArray);
-    }
+    const products = await fetchAllProducts();
+    res.status(200).json(products);
   } catch (error) {
     res.status(400).send(error.message);
   }
 };
 
-export const getProduct = async (req, res) => {
+export const getProductWithAnalytics = async (_, res) =>{
+  try{
+    const product = await getProductsController()
+    res.status(200).json(product);
+  }catch(error){
+    res.status(400).send(error.message);
+  }
+}
+
+export const getProductController = async (req, res) => {
   try {
     const id = req.params.id;
-    const docRef = await getDoc(docRef(db, 'products', id));
-    if (data.exists()) {
-      const product = new Product({id: docRef.id, ...docRef.data()})
-      res.status(200).send(product);
-    } else {
-      res.status(404).send('product not found');
-    }
+    const product = await fetchByIdProduct(id);
+    res.status(200).json(product);
   } catch (error) {
     res.status(400).send(error.message);
   }
 };
 
-export const updateProduct = async (req, res) => {
-  /* Reinitiate getProducts after using this function */
+// Remember to reinitiate getProducts after using this function 
+export const updateProductControllers = async (req, res) => {
   try {
     const id = req.params.id;
-    const oldData = req.body;
-    const updatedData = {...oldData, modified_at: now(),};
-    await updateDoc(doc(db, 'products', id), updatedData);
-    res.status(200).send('product updated successfully');
+    const newData = req.body;
+
+    if (id == null || id == '') return res.status(400).send('id was empty');
+    await putProduct(id, newData);
+    res.status(200).json('product updated successfully');
   } catch (error) {
     res.status(400).send(error.message);
   }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProductController = async (req, res) => {
   try {
+    // business logic
     const id = req.params.id;
-    await deleteDoc(doc(db, 'products', id));
-    res.status(200).send('product deleted successfully');
+    await deleteProduct(id);
+    res.status(200).json('product deleted successfully');
   } catch (error) {
     res.status(400).send(error.message);
   }
