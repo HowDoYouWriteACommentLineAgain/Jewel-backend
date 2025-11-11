@@ -1,9 +1,9 @@
-import { fetchAllProducts, createProduct, putProduct, fetchByIdProduct, deleteProduct, getAndVerifyDocSnap } from "../Repositories/ProductsRepository.js";
+import {fetchAll, create, putById, fetchById, deleteById} from "../Repositories/ProductsRepository.js";
 
 export const createProductController = async (req, res) => {
   try {
     console.log(` @createProduct Controller => req.body : ${JSON.stringify(req.body)}`);
-    const id = await createProduct(req.body);
+    const id = await create(req.body);
     res.status(201).json({message: 'Product created successfully', id: id});
   }catch (error){
     res.status(400).send(error.message);
@@ -12,7 +12,7 @@ export const createProductController = async (req, res) => {
 
 export const getProductsController = async (_, res) => {
   try {
-    const products = await fetchAllProducts();
+    const products = await fetchAll();
     res.status(200).json(products);
   } catch (error) {
     res.status(400).send(error.message);
@@ -31,7 +31,7 @@ export const getProductWithAnalytics = async (_, res) =>{
 export const getProductController = async (req, res) => {
   try {
     const id = req.params.id;
-    const product = await fetchByIdProduct(id);
+    const product = await fetchById(id);
     res.status(200).json(product);
   } catch (error) {
     res.status(400).send(error.message);
@@ -45,7 +45,7 @@ export const updateProductControllers = async (req, res) => {
     const newData = req.body;
 
     if (id == null || id == '') return res.status(400).send('id was empty');
-    await putProduct(id, newData);
+    await putById(id, newData);
     res.status(200).json('product updated successfully');
   } catch (error) {
     res.status(400).send(error.message);
@@ -56,7 +56,7 @@ export const deleteProductController = async (req, res) => {
   try {
     // business logic
     const id = req.params.id;
-    await deleteProduct(id);
+    await deleteById(id);
     res.status(200).json('product deleted successfully');
   } catch (error) {
     res.status(400).send(error.message);
