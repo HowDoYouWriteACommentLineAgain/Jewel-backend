@@ -11,50 +11,50 @@
   </div>
   <h1>Product CRUD Demo</h1>
   <div>
-    <form action="" method="POST" id="productForm">
+    <div id="productForm">
       <h2>Create</h2>
       <div>
         <label for="name">Name</label>
-        <input id="name" name="name" type="text" required/>
+        <input id="createName" name="name" type="text" required/>
       </div>
       <div>
         <label for="price">Price</label>
-        <input id="price" name="price" type="number" required/>
+        <input id="createPrice" name="price" type="number" required/>
       </div>
       <div>
         <label for="desc">Description</label>
-        <input id="desc" name="description" type="text"/>
+        <input id="createDesc" name="description" type="text"/>
       </div>
       <div>
         <label for="img">image url</label>
-        <input id="img" name="img" type="text" />
+        <input id="createImg" name="img" type="text" />
       </div>
-      <input type="submit" id="submitForm" value="Submit">
-      </form>
-      <form action="" method="PUT" id="editForm">
+      <input type="button" id="pushCreate" value="Submit">
+      </div>
+      <div id="editForm">
         <h2>Update</h2>
         <i>Select for update first to enable fields</i>
         <div>
-          <h3>Currenty editing: <input type="text" id="id" readonly/></h3>
+          <h3>Currenty editing: <input type="text" id="updateId" readonly/></h3>
           <label for="name">Name</label>
-          <input id="name" name="name" type="text" required readonly/>
+          <input id="updateName" name="name" type="text" required/>
         </div>
         <div>
           <label for="price">Price</label>
-          <input id="price" name="price" type="number" required/>
+          <input id="updatePrice" name="price" type="number" required/>
         </div>
         <div>
           <label for="desc">Description</label>
-          <input id="desc" name="description" type="text"/>
+          <input id="updateDesc" name="description" type="text"/>
         </div>
         <div>
           <label for="img">image url</label>
-          <input id="img" name="img" type="text" />
+          <input id="updateImg" name="img" type="text" />
         </div>
-        <input type="submit" id="submitForm" value="Push update" disabled>
-      </form>
+        <input type="button" id="pushUpdate" value="Push update" disabled>
+      </div>
   </div>
-  <button id="getProducts">Get Products</button>
+  <button id="getProducts" type="button">Get Products</button>
   <table id="productList"></table>
 
   <script type="module" src="./scripts/products.js" ></script>
