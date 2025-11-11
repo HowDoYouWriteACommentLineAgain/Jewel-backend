@@ -27,8 +27,8 @@ export const fetchAll = async () =>{
   return assembleArray(products);
 }
 
-export const fetch = async ({byTag = null, orderedByField = null, order = 'asc', limitAt = 50, startAfter = null}) => {
-  const q = collection(db, 'products');
+export const fetchBy = async ({byTag = null, orderedByField = null, order = 'asc', limitAt = 50, startAfter = null}) => {
+  let q = collection(db, 'products');
 
   if(byTag)           q = query(q, where("tags", "array-contains", byTag));
   if(orderedByField)  q = query(q, orderBy(orderedByField, order));

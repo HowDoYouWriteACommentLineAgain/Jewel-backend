@@ -10,6 +10,17 @@ export const create = async (req, res) => {
   }
 };
 
+export const fetchBy = async (req, res) => {
+  const {byTag, orderedByField, order, limitAt, startAfter} = req.query;
+  try {
+    const products = await ProductRepository.fetchBy({byTag, orderedByField, order, limitAt, startAfter})
+    if(products.empty) res.status(400);
+    res.status(201).json(products);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+}
+
 export const fetchAll = async (_, res) => {
   try {
     const products = await ProductRepository.fetchAll();
