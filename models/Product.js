@@ -1,5 +1,5 @@
 class Product{
-    constructor ({id = null, name, price, description, img, tags = [], stats, created_at = null, modified_at = null }){
+    constructor ({id = null, name, price, description, img, tags = [], stats = {}, created_at = null, modified_at = null }){
         if(!name) throw new Error(`Invalid name: ${name}`);
         if ( isNaN(Number(price)) || Number(price) <= 0) throw new Error(`Invalid price: `);
         
@@ -8,9 +8,9 @@ class Product{
         this.name = name;
         this.price = Number(price);
         this.description = description || null;
-        this.img = img || "No Image found";
+        this.img = img || "";
         this.tags = tags || [];
-        this.stats = stats || null;
+        this.stats = stats || {likes: 0, views: 0, shares: 0};
         this.created_at = created_at || now();
         this.modified_at = modified_at || now();
 

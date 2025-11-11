@@ -35,3 +35,5 @@ class ProductAnalytics{
         }
     }
 }
+
+export default ProductAnalytics;
