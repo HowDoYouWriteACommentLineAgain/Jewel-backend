@@ -7,7 +7,7 @@ const now = () => new Date().toISOString();
 /**
  * @returns {Product[]}
  */
-export const fetchAllProducts = async () =>{
+export const fetchAll = async () =>{
   const products = await getDocs(collection(db, 'products'));
   const productArray = [];
   if(!products.empty)
@@ -24,7 +24,7 @@ export const fetchAllProducts = async () =>{
 /**
  * @returns {Product} - Malamang
  */
-export const fetchByIdProduct = async (id) =>{
+export const fetchById = async (id) =>{
   console.log('Fetching product id:', id);
   const docSnap = await getAndVerifyDocSnap(doc(db, 'products', id));
   const product = new Product({id: docSnap.id, ...docSnap.data()});
@@ -34,7 +34,7 @@ export const fetchByIdProduct = async (id) =>{
 /**
  * @returns {number} id of created product
  */
-export const createProduct = async (data) =>{
+export const create = async (data) =>{
   const product = new Product({...data, created_at: now(), modified_at: now()}); //validation
   const docSnap = await addDoc(collection(db, 'products'), product.toFirestore());
   return docSnap.id;
@@ -45,7 +45,7 @@ export const createProduct = async (data) =>{
  * @param {object} data - data where all fields have been validated beforehand
  * @returns {void} void - ala ito dapat narereturn
  */
-export const putProduct = async (id, data) =>{
+export const putById = async (id, data) =>{
   const updatedProduct = new Product({...data, modified_at: now(),});
   const docRef = doc(db, 'products', id);
   const docSnap = await getAndVerifyDocSnap(docRef);
@@ -55,7 +55,7 @@ export const putProduct = async (id, data) =>{
 /**
  * @returns {void}
  */
-export const deleteProduct = async (id) => {
+export const deleteById = async (id) => {
   const docRef = doc(db, 'products', id);
   await getAndVerifyDocSnap(docRef);
   await deleteDoc(docRef);
