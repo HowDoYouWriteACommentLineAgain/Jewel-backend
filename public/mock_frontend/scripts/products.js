@@ -7,17 +7,20 @@ const pushUpdateButton = document.getElementById('pushUpdate');
 pushCreateButton.addEventListener('click', (e) => {
     console.log("clicked");
     e.preventDefault();
+    e.stopImmediatePropagation();
     handleAddFormSubmit();
 });
 pushUpdateButton.addEventListener('click', (e) => {
     console.log("clicked");
     e.preventDefault();
+    e.stopImmediatePropagation();
     handleUpdateFormSubmit();
 });
 
 getProductsButton.addEventListener('click', (e) => {
     console.log("clicked");
     e.preventDefault();
+    e.stopImmediatePropagation();
     loadAllFromDB();
 });
 
@@ -52,6 +55,8 @@ export const handleUpdateFormSubmit = async() =>  {
         price: document.getElementById("updatePrice").value,
         description: document.getElementById("updateDesc").value,
         img: document.getElementById("updateImg").value,
+        created_at: document.getElementById("updateCreatedAt").value,
+        tags: document.getElementById("updateTags").value.split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
     }
 
     try {
@@ -64,10 +69,10 @@ export const handleUpdateFormSubmit = async() =>  {
         if (!res.ok) throw new Error(`Failed to Update ${id}: ${res.statusText}`);
         const result = await res.json();
         console.log('Success:', result);
-        pushUpdateButton.disabled = true;
+        if(res.ok) pushUpdateButton.disabled = true;
         loadAllFromDB(); 
     } catch (error) {
-    console.error(error.message);
+        console.error(error.message);
     }
 }
 
@@ -76,7 +81,8 @@ export const handleAddFormSubmit = async() => {
         name: document.getElementById("createName").value,
         price: document.getElementById("createPrice").value,
         description: document.getElementById("createDesc").value,
-        img: document.getElementById("createImg").value
+        img: document.getElementById("createImg").value,
+        tags: document.getElementById("createTags").value.split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
     };
 
     console.log(`@ products.js img : ${data.img.value}`);
@@ -121,19 +127,17 @@ export async function loadAllFromDB(){
     
     data.forEach(p => {
         const img = document.createElement('img');
-        p.img == "" ? img.src = "": img.src = p.img; 
-        console.log(`"${p.img}" !== "No image found"`)
-
+        img.src = p.img; 
         img.alt = p.img; 
         img.style.width = '20em';
         const delButton = deleteCreatorHelper(p.id);
         const editButton = editCreatorHelper(p.id);
-        const tags = p.tags.reduce((string, curr)=> {return string + ", " +curr},"");
         const likes = p.stats?.likes ?? 0;
         const views = p.stats?.views ?? 0;
         const shares = p.stats?.shares ?? 0;
+        const tags = p.tags;
         const statsSummary = document.createElement('p'); statsSummary.innerHTML = `👍${likes}👁‍🗨 ${views}🔃 ${shares}`
-        setRow([p.name, p.price, p.create_at, p.modified_at, tags, statsSummary, img, delButton, editButton], productsTable, false);
+        setRow([p.name, p.price, p.created_at, p.modified_at, img, tags, statsSummary, delButton, editButton], productsTable, false);
     });
     handleInputReset();
     } catch (err) {
@@ -177,6 +181,8 @@ function editCreatorHelper(bId){
             document.getElementById("updatePrice").value = p.price;
             document.getElementById("updateDesc").value = p.description;
             document.getElementById("updateImg").value = p.img;
+            document.getElementById("updateTags").value = p.tags;
+            document.getElementById("updateCreatedAt").value = p.created_at;
         } catch (err) {
             console.error(err);
         }

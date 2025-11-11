@@ -70,7 +70,9 @@ export const create = async (data) =>{
 export const putById = async (id, data) =>{
   try {
     const docRef = doc(db, 'products', id);
-    const updatedProduct = new Product({...data, modified_at: now(),});
+    const updatedProduct = new Product({...data, modified_at: now(), created_at: data.created_at});
+    console.log("Now() = ",now());
+    console.log(updatedProduct.modified_at);
     await updateDoc(docRef, updatedProduct.toFirestore());
     return true;
   } catch (error) {

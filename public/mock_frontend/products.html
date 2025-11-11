@@ -11,7 +11,7 @@
   </div>
   <h1>Product CRUD Demo</h1>
   <div>
-    <div id="productForm">
+    <form id="productForm">
       <h2>Create</h2>
       <div>
         <label for="name">Name</label>
@@ -26,33 +26,42 @@
         <input id="createDesc" name="description" type="text"/>
       </div>
       <div>
-        <label for="img">image url</label>
+        <label for="img">Image url</label>
         <input id="createImg" name="img" type="text" />
       </div>
+      <div>
+        <label for="name">Tags</label>
+        <input id="createTags" name="createTags" type="text" required multiple/>
+      </div>
       <input type="button" id="pushCreate" value="Submit">
+    </form>
+    <form id="editForm">
+      <h2>Update</h2>
+      <i>Select for update first to enable fields</i>
+      <div>
+        <h3>Currenty editing: <input type="text" id="updateId" readonly/></h3>
+        <input id="updateCreatedAt" type="text" hidden>
+        <label for="name">Name</label>
+        <input id="updateName" name="name" type="text" required/>
       </div>
-      <div id="editForm">
-        <h2>Update</h2>
-        <i>Select for update first to enable fields</i>
-        <div>
-          <h3>Currenty editing: <input type="text" id="updateId" readonly/></h3>
-          <label for="name">Name</label>
-          <input id="updateName" name="name" type="text" required/>
-        </div>
-        <div>
-          <label for="price">Price</label>
-          <input id="updatePrice" name="price" type="number" required/>
-        </div>
-        <div>
-          <label for="desc">Description</label>
-          <input id="updateDesc" name="description" type="text"/>
-        </div>
-        <div>
-          <label for="img">image url</label>
-          <input id="updateImg" name="img" type="text" />
-        </div>
-        <input type="button" id="pushUpdate" value="Push update" disabled>
+      <div>
+        <label for="price">Price</label>
+        <input id="updatePrice" name="price" type="number" required/>
       </div>
+      <div>
+        <label for="desc">Description</label>
+        <input id="updateDesc" name="description" type="text"/>
+      </div>
+      <div>
+        <label for="img">Image url</label>
+        <input id="updateImg" name="img" type="text" />
+      </div>
+      <div>
+        <label for="name">Tags</label>
+        <input id="updateTags" name="updateTags" type="text" required multiple/>
+      </div>
+      <input type="button" id="pushUpdate" value="Push update" disabled>
+    </form>
   </div>
   <button id="getProducts" type="button">Get Products</button>
   <table id="productList"></table>
