@@ -1,38 +1,60 @@
 import Product from "../models/Product.js";
 import db from "../firebaseConfiguration.js";
-import {collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
-
+import {collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, orderBy, where, query, limit } from "firebase/firestore";
+//query and limit are not read. furthermore limit does not exist 
 const now = () => new Date().toISOString();
 
 /**
  * @returns {Product[]}
  */
-export const fetchAll = async () =>{
-  const products = await getDocs(collection(db, 'products'));
-  const productArray = [];
-  if(!products.empty)
+
+const assembleArray = (products) => {
+  const productsArray = [];
+  if(!products.empty){
     products.forEach(doc => {
       try{      
-        productArray.push(new Product({id: doc.id,...doc.data()}));//validation
+        productsArray.push(new Product({id: doc.id,...doc.data()}));//validation
       }catch(e){ 
         console.warn(`Skipped invalid doc ${doc.id} : ${e.message}`);
       }
     });
-  return productArray;
+  }
+  return productsArray;
+}
+
+export const fetchAll = async () =>{
+  const products = await getDocs(collection(db, 'products'));
+  return assembleArray(products);
+}
+
+export const fetch = async ({byTag = null, orderedByField = null, order = 'asc', limitAt = 50, startAfter = null}) => {
+  const q = collection(db, 'products');
+
+  if(byTag)           q = query(q, where("tags", "array-contains", byTag));
+  if(orderedByField)  q = query(q, orderBy(orderedByField, order));
+  if(startAfter)      q = query(q, startAfter(startAfter));
+  
+  q = query(q, limit(limitAt))
+
+  const products = await getDocs(q);
+  return assembleArray(products);
 }
 
 /**
- * @returns {Product} - Malamang
+ * @returns {Product}
  */
 export const fetchById = async (id) =>{
   console.log('Fetching product id:', id);
-  const docSnap = await getAndVerifyDocSnap(doc(db, 'products', id));
+  const docSnap = await getDoc(doc(db, 'products', id));
+
+  if (!docSnap.exists()) return null; // verify that doc even exists before validating
+
   const product = new Product({id: docSnap.id, ...docSnap.data()});
   return product;
 }
 
 /**
- * @returns {number} id of created product
+ * @returns {string} id of created product
  */
 export const create = async (data) =>{
   const product = new Product({...data, created_at: now(), modified_at: now()}); //validation
@@ -41,28 +63,33 @@ export const create = async (data) =>{
 }
 
 /**
- * @param {number} id - id of updateable firld. Must exist beforehand
+ * @param {string} id - id of updateable firld. Must exist beforehand
  * @param {object} data - data where all fields have been validated beforehand
- * @returns {void} void - ala ito dapat narereturn
+ * @returns {bool} 
  */
 export const putById = async (id, data) =>{
-  const updatedProduct = new Product({...data, modified_at: now(),});
-  const docRef = doc(db, 'products', id);
-  const docSnap = await getAndVerifyDocSnap(docRef);
-  if(docSnap.exists()) async() => await updateDoc(docRef, updatedProduct.toFirestore());
+  try {
+    const docRef = doc(db, 'products', id);
+    const updatedProduct = new Product({...data, modified_at: now(),});
+    await updateDoc(docRef, updatedProduct.toFirestore());
+    return true;
+  } catch (error) {
+    if (error.message === 'not-found');
+    throw error;
+  }
 }
 
 /**
- * @returns {void}
+ * @param {string}
+ * @returns {bool}
  */
 export const deleteById = async (id) => {
-  const docRef = doc(db, 'products', id);
-  await getAndVerifyDocSnap(docRef);
-  await deleteDoc(docRef);
-}
-
-export const getAndVerifyDocSnap = async (docRef) => {
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) throw new Error('Product not found');
-  return docSnap;
+  try {
+    const docRef = doc(db, 'products', id);
+    await deleteDoc(docRef);  
+    return true;
+  } catch (error) {
+   if (error.message === 'not-found') return false;
+   throw error;
+  }
 }

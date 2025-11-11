@@ -14,6 +14,8 @@ class Product{
         this.created_at = created_at || now();
         this.modified_at = modified_at || now();
 
+        this.hasTags = tags.length > 0;
+
         console.log(` @Products Constructor image : ${this.img}`);
         // console.log(` Product model @ constructor created_at : ${created_at}`);
         // console.log(` Product model @ constructor modified_at : ${modified_at}`);
@@ -29,6 +31,7 @@ class Product{
             description:this.description,
             img: this.img,
             tags: this.tags,
+            hasTags: this.hasTags,
             stats: this.stats,
             created_at: this.created_at,
             modified_at: this.modified_at
